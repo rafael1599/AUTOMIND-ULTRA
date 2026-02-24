@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot WebSocket Test</title>
+    <style>
+        body { font-family: sans-serif; background: #1a1a24; color: #fff; padding: 20px; }
+        #canvas-container { position: relative; width: 500px; height: 500px; background: #2a2a35; border: 2px solid #444; cursor: crosshair; }
+        .robot { position: absolute; width: 10px; height: 10px; background: cyan; border-radius: 50%; transform: translate(-50%, -50%); transition: all 0.05s linear; }
+        .goal { position: absolute; width: 16px; height: 16px; background: lime; border-radius: 50%; transform: translate(-50%, -50%); }
+        .obstacle { position: absolute; background: crimson; border-radius: 50%; transform: translate(-50%, -50%); }
+        .ray { position: absolute; width: 50px; height: 1px; background: rgba(0, 255, 255, 0.5); transform-origin: left center; }
+        #log { margin-top: 20px; color: #aaa; font-family: monospace; white-space: pre-wrap; height: 150px; overflow-y: auto; background: #000; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Test Client: WebSockets & Backend PPO</h2>
+    <p>Haz clic en el cuadro azul para enviar un evento `place_obstacle` al servidor Python.</p>
+    
+    <div id="canvas-container">
+        <div id="goal" class="goal"></div>
+        <div id="robot" class="robot">
+            <div id="ray-front" class="ray" style="transform: rotate(0deg);"></div>
+            <div id="ray-back" class="ray" style="transform: rotate(180deg);"></div>
+            <div id="ray-left" class="ray" style="transform: rotate(-90deg);"></div>
+            <div id="ray-right" class="ray" style="transform: rotate(90deg);"></div>
+        </div>
+    </div>
+    
+    <div id="log">Sensors Data:</div>
+
+    <script>
+        const ws = new WebSocket("ws://localhost:8000/ws");
+        const container = document.getElementById("canvas-container");
+        const robot = document.getElementById("robot");
+        const goal = document.getElementById("goal");
+        const log = document.getElementById("log");
+        
+        let containerSize = 500; // mapped to environment size 1.0
+
+        ws.onopen = () => {
+            log.innerText = "Conectado al servidor WebSocket 8000";
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            
+            if (data.type === "state_update") {
+                // Actualizar Robot
+                robot.style.left = (data.robot.x * containerSize) + "px";
+                robot.style.top = (data.robot.y * containerSize) + "px";
+                robot.style.transform = `translate(-50%, -50%) rotate(${data.robot.angle}rad)`;
+                
+                // Actualizar Meta
+                goal.style.left = (data.goal.x * containerSize) + "px";
+                goal.style.top = (data.goal.y * containerSize) + "px";
+                
+                // Representar sensores (rojo si está cerca de chocar, opaco si choca)
+                const s = data.sensors;
+                document.getElementById('ray-front').style.background = `rgba(255, 50, 50, ${s.front})`;
+                document.getElementById('ray-back').style.background = `rgba(255, 50, 50, ${s.back})`;
+                document.getElementById('ray-left').style.background = `rgba(255, 50, 50, ${s.left})`;
+                document.getElementById('ray-right').style.background = `rgba(255, 50, 50, ${s.right})`;
+                
+                log.innerText = `Sensores => F: ${s.front.toFixed(2)}, B: ${s.back.toFixed(2)}, L: ${s.left.toFixed(2)}, R: ${s.right.toFixed(2)}`;
+                
+                // Actualizar obstáculos dinámicos
+                // (Para evitar redibujar todo, borramos los viejos de DOM y ponemos los de la lista iterando)
+                document.querySelectorAll('.obstacle').forEach(e => e.remove());
+                data.obstacles.forEach(obs => {
+                    let div = document.createElement("div");
+                    div.className = "obstacle";
+                    div.style.left = (obs.x * containerSize) + "px";
+                    div.style.top = (obs.y * containerSize) + "px";
+                    div.style.width = (obs.r * 2 * containerSize) + "px";
+                    div.style.height = (obs.r * 2 * containerSize) + "px";
+                    container.appendChild(div);
+                });
+            }
+        };
+
+        // Enviar clic para spawnear un obstáculo en el backend
+        container.addEventListener("click", (e) => {
+            const rect = container.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / containerSize;
+            const y = (e.clientY - rect.top) / containerSize;
+            
+            console.log(`Enviando obstáculo: ${x}, ${y}`);
+            ws.send(JSON.stringify({
+                type: "place_obstacle",
+                x: x,
+                y: y
+            }));
+        });
+    </script>
+</body>
+</html>
