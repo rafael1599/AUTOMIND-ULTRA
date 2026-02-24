@@ -12,8 +12,8 @@ from train_robot import Agent
 # --- CONFIGURACIÓN ---
 FPS = 20
 TICK_RATE = 1.0 / FPS
-LEVEL_TO_LOAD = 3
-MODEL_PATH = f"models/automind_L{LEVEL_TO_LOAD}.pth"
+LEVEL_TO_LOAD = 6
+MODEL_PATH = "models/automind_final.pth"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # --- ESTADO GLOBAL ---
