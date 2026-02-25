@@ -42,6 +42,33 @@ export default function HUD({ connected, state }) {
                             {tool?.picked ? 'DELIVER TO GOAL' : 'RETRIEVE TOOLBOX'}
                         </span>
                     </div>
+
+                    {/* Intervention Mode Switcher */}
+                    <div className="mt-4 flex flex-col items-end pointer-events-auto">
+                        <span className="text-[9px] text-cyan-500/50 font-mono uppercase tracking-[0.2em] mb-2">Intervention Mode</span>
+                        <div className="flex gap-1 bg-black/80 p-1 rounded-lg border border-cyan-900/50 backdrop-blur">
+                            <button
+                                onClick={() => state.setMode?.('swarm')}
+                                className={`px-3 py-1 text-[10px] font-bold rounded transition-all ${state.mode === 'swarm' ? 'bg-cyan-500 text-black shadow-[0_0_10px_rgba(6,182,212,0.5)]' : 'text-cyan-500/40 hover:text-cyan-400'}`}
+                            >
+                                RANDOM SWARM
+                            </button>
+                            <button
+                                onClick={() => state.setMode?.('god')}
+                                className={`px-3 py-1 text-[10px] font-bold rounded transition-all ${state.mode === 'god' ? 'bg-red-500 text-black shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'text-red-500/40 hover:text-red-400'}`}
+                            >
+                                GOD'S FINGER
+                            </button>
+                        </div>
+                        {state.mode === 'god' && (
+                            <button
+                                onClick={() => state.clearMap?.()}
+                                className="mt-2 px-4 py-1.5 bg-red-600/20 hover:bg-red-600/40 text-red-500 text-[10px] font-black border border-red-500/50 rounded animate-pulse transition-all"
+                            >
+                                ⚡ PURGE ALL ENTITIES
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -67,59 +94,97 @@ export default function HUD({ connected, state }) {
                 </div>
             )}
 
-            {/* Bottom Bar: Telemetry */}
-            <div className="flex flex-wrap gap-6 items-end">
-
-                {/* Battery Bar */}
-                <div className="bg-black/80 border border-cyan-900/40 p-4 rounded-xl backdrop-blur-md w-64">
-                    <div className="flex justify-between items-end mb-2 border-b border-cyan-900/30 pb-2">
-                        <h2 className="text-cyan-500/50 text-xs font-bold tracking-widest uppercase">Power Core</h2>
-                        <span className="font-mono text-xs text-cyan-100">{batteryPercent.toFixed(1)}%</span>
+            {/* Bottom Bar: Telemetry & Radar */}
+            <div className="flex justify-between items-end w-full">
+                {/* Left Side: Battery & Coordinates */}
+                <div className="flex gap-6 items-end">
+                    {/* Battery Bar */}
+                    <div className="bg-black/80 border border-cyan-900/40 p-4 rounded-xl backdrop-blur-md w-64">
+                        <div className="flex justify-between items-end mb-2 border-b border-cyan-900/30 pb-2">
+                            <h2 className="text-cyan-500/50 text-xs font-bold tracking-widest uppercase">Power Core</h2>
+                            <span className="font-mono text-xs text-cyan-100">{batteryPercent.toFixed(1)}%</span>
+                        </div>
+                        <div className="w-full bg-gray-900 rounded h-4 overflow-hidden shadow-inner border border-gray-700/50">
+                            <div
+                                className={`h-full ${batteryColor} transition-all duration-300`}
+                                style={{ width: `${batteryPercent}%` }}
+                            />
+                        </div>
                     </div>
-                    <div className="w-full bg-gray-900 rounded h-4 overflow-hidden shadow-inner border border-gray-700/50">
-                        <div
-                            className={`h-full ${batteryColor} transition-all duration-300`}
-                            style={{ width: `${batteryPercent}%` }}
-                        />
-                    </div>
-                </div>
 
-                {/* Sensor Array Data (8-ray) */}
-                <div className="bg-black/60 border border-cyan-900/40 p-4 rounded-xl backdrop-blur-md w-72">
-                    <h2 className="text-cyan-500/50 text-xs font-bold tracking-widest uppercase mb-3 border-b border-cyan-900/30 pb-2 flex justify-between">
-                        <span>LiDAR Array</span>
-                        <span className="text-[10px] text-gray-500">8-DIRECTION</span>
-                    </h2>
-                    <div className="grid grid-cols-4 gap-y-2 gap-x-2 font-mono text-[10px] text-center">
-                        {sensors.map((s, i) => (
-                            <div key={i} className="bg-black/40 rounded py-1 px-1 border border-cyan-900/20">
-                                <p className="text-gray-600 mb-1">R{i}</p>
-                                <p className={`font-bold ${getDangerColor(s)}`}>
-                                    {(s * 100).toFixed(0)}%
-                                </p>
+                    {/* Global Position */}
+                    <div className="bg-black/60 border border-cyan-900/40 p-4 rounded-xl backdrop-blur-md">
+                        <h2 className="text-cyan-500/50 text-xs font-bold tracking-widest uppercase mb-3 border-b border-cyan-900/30 pb-2">
+                            Local Coordinates
+                        </h2>
+                        <div className="font-mono text-cyan-100 flex gap-4 text-xs">
+                            <div className="bg-cyan-900/20 p-2 rounded">
+                                <span className="text-gray-500 text-[9px] block mb-1">X_POS</span>
+                                {robot ? robot.x.toFixed(3) : '0.000'}
                             </div>
-                        ))}
+                            <div className="bg-cyan-900/20 p-2 rounded">
+                                <span className="text-gray-500 text-[9px] block mb-1">Y_POS</span>
+                                {robot ? robot.y.toFixed(3) : '0.000'}
+                            </div>
+                            <div className="bg-cyan-900/20 p-2 rounded">
+                                <span className="text-gray-500 text-[9px] block mb-1">HEADING</span>
+                                {robot ? (robot.angle * (180 / Math.PI)).toFixed(1) : '0.0'}°
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Global Position */}
-                <div className="bg-black/60 border border-cyan-900/40 p-4 rounded-xl backdrop-blur-md">
-                    <h2 className="text-cyan-500/50 text-xs font-bold tracking-widest uppercase mb-3 border-b border-cyan-900/30 pb-2">
-                        Local Coordinates
-                    </h2>
-                    <div className="font-mono text-cyan-100 flex gap-4 text-xs">
-                        <div className="bg-cyan-900/20 p-2 rounded">
-                            <span className="text-gray-500 text-[9px] block mb-1">X_POS</span>
-                            {robot ? robot.x.toFixed(3) : '0.000'}
-                        </div>
-                        <div className="bg-cyan-900/20 p-2 rounded">
-                            <span className="text-gray-500 text-[9px] block mb-1">Y_POS</span>
-                            {robot ? robot.y.toFixed(3) : '0.000'}
-                        </div>
-                        <div className="bg-cyan-900/20 p-2 rounded">
-                            <span className="text-gray-500 text-[9px] block mb-1">HEADING</span>
-                            {robot ? (robot.angle * (180 / Math.PI)).toFixed(1) : '0.0'}°
-                        </div>
+                {/* Right Side: Radar Array */}
+                <div className="bg-black/40 border border-white/5 p-6 rounded-full backdrop-blur-xl flex flex-col items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.4)]">
+                    <div className="relative w-36 h-36 flex items-center justify-center">
+                        {/* Scanning Sweep Effect */}
+                        <div className="absolute w-full h-full border border-cyan-500/10 rounded-full" />
+                        <div className="absolute w-2/3 h-2/3 border border-cyan-500/10 rounded-full opacity-60" />
+                        <div className="absolute w-1/3 h-1/3 border border-cyan-500/10 rounded-full opacity-30" />
+
+                        {/* Scanning Beam */}
+                        <div className="absolute w-1/2 h-1/2 origin-bottom-right top-0 left-0 bg-gradient-to-br from-cyan-500/20 to-transparent rounded-tl-full animate-[spin_4s_linear_infinite] pointer-events-none" />
+
+                        {/* High-Fidelity Sensor Blips */}
+                        {sensors.map((s, i) => {
+                            const angleDeg = i * 45 - 90;
+                            const angleRad = (angleDeg * Math.PI) / 180;
+
+                            const radius = 72;
+                            const distanceFactor = Math.max(0.1, 1.0 - s);
+                            const x = Math.cos(angleRad) * (radius * distanceFactor);
+                            const y = Math.sin(angleRad) * (radius * distanceFactor);
+
+                            let color = "rgba(6, 182, 212, 0.6)";
+                            let shadow = "0 0 8px rgba(6, 182, 212, 0.4)";
+                            if (s > 0.4) {
+                                color = "rgba(250, 204, 21, 0.8)";
+                                shadow = "0 0 12px rgba(250, 204, 21, 0.6)";
+                            }
+                            if (s > 0.8) {
+                                color = "rgba(239, 68, 68, 1)";
+                                shadow = "0 0 20px rgba(239, 68, 68, 0.8)";
+                            }
+
+                            return (
+                                <div
+                                    key={i}
+                                    className="absolute transition-all duration-300 ease-out"
+                                    style={{
+                                        transform: `translate(${x}px, ${y}px)`,
+                                        width: s > 0.8 ? '8px' : '6px',
+                                        height: s > 0.8 ? '8px' : '6px',
+                                        backgroundColor: color,
+                                        boxShadow: shadow,
+                                        borderRadius: '1px',
+                                        opacity: s > 0.05 ? 1 : 0.1
+                                    }}
+                                />
+                            );
+                        })}
+
+                        {/* Robot Center Point */}
+                        <div className="w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)] z-10" />
                     </div>
                 </div>
             </div>

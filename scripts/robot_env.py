@@ -37,6 +37,8 @@ class RobotEnv(gym.Env):
         self.obstacles = []
         self.dyn_obstacles = []
         self.forced_scenario = None
+        self.user_intervention = None # "God's Finger" position [x, y]
+        self.god_mode = False # If True, don't spawn obstacles on reset
 
     def set_level(self, level):
         self.current_level = level
@@ -78,7 +80,11 @@ class RobotEnv(gym.Env):
             self.obstacles = []
             self.dyn_obstacles = []
 
-            if self.current_level <= 3:
+            if self.god_mode:
+                # In God Mode, we start with a clean slate
+                num_obstacles = 0
+                num_dyn = 0
+            elif self.current_level <= 3:
                 num_obstacles = min(2 * self.current_level, 6)
                 num_dyn = min(self.current_level, 3)
             elif self.current_level == 4: # LVL 4: SWARM
@@ -170,9 +176,14 @@ class RobotEnv(gym.Env):
             if pos[1] < dyn["r"] or pos[1] > self.size - dyn["r"]:
                 vel[1] *= -1
                 pos[1] = np.clip(pos[1], dyn["r"], self.size - dyn["r"])
+        
+        # User Intervention (God's Finger) - Behaves as a dangerous zone
+        user_obs = []
+        if self.user_intervention:
+            user_obs.append((self.user_intervention[0], self.user_intervention[1], 0.04)) # Danger radius
                 
         hit_obstacle = False
-        all_obs = self.obstacles + [(d["pos"][0], d["pos"][1], d["r"]) for d in self.dyn_obstacles]
+        all_obs = self.obstacles + [(d["pos"][0], d["pos"][1], d["r"]) for d in self.dyn_obstacles] + user_obs
         for obs in all_obs:
             dist = np.linalg.norm(np.array([new_x, new_y]) - np.array([obs[0], obs[1]]))
             if dist < (self.robot_radius + obs[2]):
@@ -260,7 +271,12 @@ class RobotEnv(gym.Env):
     def _get_raycasts(self):
         angles_rel = [i * (math.pi/4) for i in range(8)]
         sensor_values = np.zeros(8, dtype=np.float32)
-        all_obs = self.obstacles + [(d["pos"][0], d["pos"][1], d["r"]) for d in self.dyn_obstacles]
+        
+        user_obs = []
+        if self.user_intervention:
+            user_obs.append((self.user_intervention[0], self.user_intervention[1], 0.04))
+
+        all_obs = self.obstacles + [(d["pos"][0], d["pos"][1], d["r"]) for d in self.dyn_obstacles] + user_obs
         
         for i, angle_rel in enumerate(angles_rel):
             global_angle = self.robot_angle + angle_rel
