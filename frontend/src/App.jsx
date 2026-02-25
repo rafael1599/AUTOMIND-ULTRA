@@ -29,7 +29,7 @@ export default function App() {
     battery: 1.0,
     sensors: [0, 0, 0, 0, 0, 0, 0, 0],
     game_state: 'playing',
-    mode: 'swarm', // Default mode: Just observing
+    mode: 'swarm',
     setMode: (m) => {
       setUiState(prev => ({ ...prev, mode: m }))
       if (wsRef.current?.readyState === WebSocket.OPEN) {
