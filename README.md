@@ -13,57 +13,58 @@
 
 ## 🛠️ Setup & Execution Manual
 
-> **IMPORTANT:** Replace `[YOUR_PROJECT_PATH]` with the absolute path where you cloned this repository (e.g., `C:\Users\Name\Documents\AUTOMIND-ULTRA`).
+**Paso 0: Navegar a la raíz del proyecto**
+Abre **PowerShell** y entra en la carpeta donde clonaste el repositorio:
+```powershell
+cd "C:\Ruta\A\TU\AUTOMIND-ULTRA"
+```
 
-### **1. Initial Setup (First Time Only)**
-Open **PowerShell** and run these commands to prepare your environment:
+---
+
+### **1. Configuración Inicial (Solo la primera vez)**
+Ejecuta estos comandos para preparar el entorno:
 
 ```powershell
-# 1. Navigate to the scripts directory
-cd "[YOUR_PROJECT_PATH]\scripts"
-
-# 2. Create the Python Virtual Environment
+# 1. Configurar Entorno Virtual de Python
+cd scripts
 python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install torch numpy fastapi uvicorn gymnasium pygame tqdm stable-baselines3
 
-# 3. Install AI & Server dependencies
-& "[YOUR_PROJECT_PATH]\scripts\.venv\Scripts\python.exe" -m pip install torch numpy fastapi uvicorn gymnasium pygame tqdm stable-baselines3
-
-# 4. Navigate to frontend and install web dependencies
-cd "[YOUR_PROJECT_PATH]\frontend"
+# 2. Configurar Frontend
+cd ..\frontend
 npm install
 ```
 
 ---
 
-### **2. Running the System**
+### **2. Ejecución del Sistema**
 
-#### **A. Start the 3D Web Interface (Frontend)**
-**Terminal 1:**
+#### **A. Interfaz Web 3D (Frontend)**
+**Terminal 1 (desde la raíz del proyecto):**
 ```powershell
-cd "[YOUR_PROJECT_PATH]\frontend"
+cd frontend
 npm run dev
 ```
-*Access via browser at:* `http://localhost:5173`
+*Acceso vía navegador:* `http://localhost:5173`
 
-#### **B. Start the AI Central Intelligence (Socket Server)**
-**Terminal 2:**
+#### **B. Inteligencia Central AI (Socket Server)**
+**Terminal 2 (desde la raíz del proyecto):**
 ```powershell
-cd "[YOUR_PROJECT_PATH]\scripts"
-& "[YOUR_PROJECT_PATH]\scripts\.venv\Scripts\python.exe" server.py
+cd scripts
+.\.venv\Scripts\python.exe server.py
 ```
 
-#### **C. Strategic Training (Optional)**
-**Terminal 3:**
+#### **C. Entrenamiento Estratégico (Opcional)**
+**Terminal 3 (desde la raíz del proyecto):**
 ```powershell
-# Run this if you want to train a fresh agent from scratch
-cd "[YOUR_PROJECT_PATH]\scripts"
-& "[YOUR_PROJECT_PATH]\scripts\.venv\Scripts\python.exe" train_robot.py
+cd scripts
+.\.venv\Scripts\python.exe train_robot.py
 ```
 
 ---
 
 ## 💡 Troubleshooting Tips
-*   **Module Mismatch**: If you see `ModuleNotFoundError: No module named 'torch'`, ensures you are using the full path prefix: `& "[YOUR_PROJECT_PATH]\scripts\.venv\Scripts\python.exe"`.
+*   **Error de Módulos**: Si ves `ModuleNotFoundError: No module named 'torch'`, asegúrate de estar usando el ejecutable del entorno virtual: `.\.venv\Scripts\python.exe`.
 *   **Visual Assets**: Ensure `.glb` models (e.g., `drone.glb`, `anime_vfx.glb`) are located in `frontend/public/` for correct scene rendering.
 *   **Execution Policy**: In Windows, if scripts are blocked, run: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process`.
 
