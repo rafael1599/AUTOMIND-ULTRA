@@ -28,7 +28,7 @@ Ejecuta estos comandos para preparar el entorno:
 # 1. Configurar Entorno Virtual de Python
 cd scripts
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install torch numpy fastapi uvicorn gymnasium pygame tqdm stable-baselines3
+.\.venv\Scripts\python.exe -m pip install torch numpy fastapi "uvicorn[standard]" websockets gymnasium pygame tqdm stable-baselines3
 
 # 2. Configurar Frontend
 cd ..\frontend
