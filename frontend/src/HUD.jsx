@@ -15,31 +15,31 @@ export default function HUD({ connected, state }) {
     if (batteryPercent < 20) batteryColor = "bg-red-500 animate-pulse"
 
     return (
-        <div className="absolute top-0 left-0 w-full h-full pointer-events-none p-6 flex flex-col justify-between z-10">
+        <div className="absolute top-0 left-0 w-full h-full pointer-events-none p-2 sm:p-4 md:p-6 flex flex-col justify-between z-10">
             {/* Top Bar */}
             <div className="flex justify-between items-start">
                 <div>
-                    <h1 className="text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">
+                    <h1 className="text-xl md:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600 shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
                         AUTO-TRAP v2.0
                     </h1>
-                    <p className="text-xs text-cyan-200 tracking-widest uppercase mt-1 opacity-70">
+                    <p className="hidden md:block text-xs text-cyan-200 tracking-widest uppercase mt-1 opacity-70">
                         Advanced Logistics & Pathfinding Routine
                     </p>
                 </div>
 
                 <div className="flex flex-col items-end">
-                    <div className="flex items-center gap-2 bg-black/50 px-4 py-2 border border-cyan-900/50 rounded-lg backdrop-blur-md mb-2">
-                        <div className={`w-3 h-3 rounded-full ${connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-                        <span className={`font-mono text-sm tracking-wider ${connected ? 'text-green-400' : 'text-red-400'}`}>
+                    <div className="flex items-center gap-2 bg-black/50 px-2 py-1 md:px-4 md:py-2 border border-cyan-900/50 rounded-lg backdrop-blur-md mb-2">
+                        <div className={`w-2 h-2 md:w-3 md:h-3 rounded-full ${connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                        <span className={`font-mono text-[10px] md:text-sm tracking-wider ${connected ? 'text-green-400' : 'text-red-400'}`}>
                             {connected ? 'LINK ESTABLISHED' : 'NO SIGNAL'}
                         </span>
                     </div>
 
                     {/* Mission Active Objective */}
-                    <div className="flex flex-col items-end bg-black/60 px-4 py-2 border border-cyan-500/30 rounded backdrop-blur">
-                        <span className="text-[10px] text-cyan-500 font-mono uppercase tracking-widest">Current Objective</span>
-                        <span className={`text-sm font-bold tracking-widest uppercase ${tool?.picked ? 'text-green-400' : 'text-yellow-400'}`}>
-                            {tool?.picked ? 'DELIVER TO GOAL' : 'RETRIEVE TOOLBOX'}
+                    <div className="flex flex-col items-end bg-black/60 px-2 py-1 md:px-4 md:py-2 border border-cyan-500/30 rounded backdrop-blur max-w-[150px] md:max-w-none">
+                        <span className="text-[8px] md:text-[10px] text-cyan-500 font-mono uppercase tracking-widest text-right">Current Objective</span>
+                        <span className={`text-[10px] md:text-sm font-bold tracking-widest uppercase text-right ${tool?.picked ? 'text-green-400' : 'text-yellow-400'}`}>
+                            {tool?.picked ? 'DELIVER TO GOAL' : 'RETRIEVE TOOL' /* Shorter text for mobile */}
                         </span>
                     </div>
 
@@ -99,7 +99,7 @@ export default function HUD({ connected, state }) {
                 {/* Left Side: Battery & Coordinates */}
                 <div className="flex gap-6 items-end">
                     {/* Battery Bar */}
-                    <div className="bg-black/80 border border-cyan-900/40 p-4 rounded-xl backdrop-blur-md w-64">
+                    <div className="bg-black/80 border border-cyan-900/40 p-2 md:p-4 rounded-xl backdrop-blur-md w-32 md:w-64">
                         <div className="flex justify-between items-end mb-2 border-b border-cyan-900/30 pb-2">
                             <h2 className="text-cyan-500/50 text-xs font-bold tracking-widest uppercase">Power Core</h2>
                             <span className="font-mono text-xs text-cyan-100">{batteryPercent.toFixed(1)}%</span>
@@ -112,8 +112,8 @@ export default function HUD({ connected, state }) {
                         </div>
                     </div>
 
-                    {/* Global Position */}
-                    <div className="bg-black/60 border border-cyan-900/40 p-4 rounded-xl backdrop-blur-md">
+                    {/* Global Position (Hidden on mobile) */}
+                    <div className="hidden md:block bg-black/60 border border-cyan-900/40 p-4 rounded-xl backdrop-blur-md">
                         <h2 className="text-cyan-500/50 text-xs font-bold tracking-widest uppercase mb-3 border-b border-cyan-900/30 pb-2">
                             Local Coordinates
                         </h2>
@@ -135,8 +135,8 @@ export default function HUD({ connected, state }) {
                 </div>
 
                 {/* Right Side: Radar Array */}
-                <div className="bg-black/40 border border-white/5 p-6 rounded-full backdrop-blur-xl flex flex-col items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.4)]">
-                    <div className="relative w-36 h-36 flex items-center justify-center">
+                <div className="bg-black/40 border border-white/5 p-3 md:p-6 rounded-full backdrop-blur-xl flex flex-col items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.4)]">
+                    <div className="relative w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 flex items-center justify-center">
                         {/* Scanning Sweep Effect */}
                         <div className="absolute w-full h-full border border-cyan-500/10 rounded-full" />
                         <div className="absolute w-2/3 h-2/3 border border-cyan-500/10 rounded-full opacity-60" />

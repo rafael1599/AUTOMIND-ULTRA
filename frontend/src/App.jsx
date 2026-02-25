@@ -78,12 +78,12 @@ export default function App() {
 
   return (
     <div
-      className="w-screen h-screen flex flex-row overflow-hidden bg-black font-sans text-white select-none"
+      className="w-screen h-[100dvh] flex flex-col md:flex-row overflow-hidden bg-black font-sans text-white select-none relative"
     >
 
-      {/* 2D MAP VIEW (Left) */}
-      <div className="w-1/3 h-full border-r border-cyan-900/50 relative">
-        <div className="absolute top-4 left-4 z-20 bg-black/60 px-3 py-1 rounded text-[10px] font-mono border border-cyan-500/30">
+      {/* 2D MAP VIEW (Top/Left) */}
+      <div className="w-full h-1/2 md:w-1/3 md:h-full border-b md:border-b-0 md:border-r border-cyan-900/50 relative">
+        <div className="absolute top-2 left-2 md:top-4 md:left-4 z-20 bg-black/60 px-2 py-1 md:px-3 rounded text-[8px] md:text-[10px] font-mono border border-cyan-500/30">
           STRATEGIC MAP (TOP-DOWN)
         </div>
         <Canvas camera={{ position: [0, 200, 0], fov: 40 }}>
@@ -100,9 +100,9 @@ export default function App() {
         </Canvas>
       </div>
 
-      {/* 3D ACTION VIEW (Right) */}
-      <div className="w-2/3 h-full relative">
-        <div className="absolute top-4 right-4 z-20 bg-black/60 px-3 py-1 rounded text-[10px] font-mono border border-blue-500/30 text-blue-400">
+      {/* 3D ACTION VIEW (Bottom/Right) */}
+      <div className="w-full h-1/2 md:w-2/3 md:h-full relative">
+        <div className="absolute top-2 right-2 md:top-4 md:right-4 z-20 bg-black/60 px-2 py-1 md:px-3 rounded text-[8px] md:text-[10px] font-mono border border-blue-500/30 text-blue-400">
           DIRECTOR VIEW (CINEMATIC)
         </div>
         <Canvas
